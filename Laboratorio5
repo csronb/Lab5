@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definición del nodo de la lista vinculada
+struct ListNode {
+    int val;
+    struct ListNode* next;
+};
+
+// Función para crear un nuevo nodo de lista
+struct ListNode* createNode(int val) {
+    struct ListNode* newNode = (struct ListNode*)malloc(sizeof(struct ListNode));
+    if (!newNode) {
+        printf("Error al asignar memoria.\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->val = val;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Función para fusionar k listas ordenadas
+struct ListNode* mergeKLists(struct ListNode** lists, int listsSize) {
+    // Usamos una lista ficticia para facilitar la manipulación de la cabeza
+    struct ListNode* head = NULL;
+    struct ListNode* tail = NULL;
+
+    // Proceso de fusión
+    while (1) {
+        int minIndex = -1;
+        int minVal = 10001; // Un valor mayor que el máximo permitido en la lista
+
+        // Buscar el nodo más pequeño entre las listas disponibles
+        for (int i = 0; i < listsSize; i++) {
+            if (lists[i] != NULL && lists[i]->val < minVal) {
+                minVal = lists[i]->val;
+                minIndex = i;
+            }
+        }
+
+        // Si no encontramos un nodo para fusionar, terminamos
+        if (minIndex == -1) {
+            break;
+        }
+
+        // Crear un nuevo nodo con el valor más pequeño
+        struct ListNode* newNode = createNode(minVal);
+
+        // Mover el puntero de la lista seleccionada al siguiente nodo
+        lists[minIndex] = lists[minIndex]->next;
+
+        // Si es la primera vez que estamos insertando, establecer la cabeza
+        if (head == NULL) {
+            head = newNode;
+            tail = head;
+        } else {
+            tail->next = newNode;
+            tail = tail->next;
+        }
+    }
+
+    return head;
+}
+
+// Función para imprimir la lista
+void printList(struct ListNode* head) {
+    struct ListNode* current = head;
+    while (current != NULL) {
+        printf("%d ", current->val);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    // Ejemplo de entrada: tres listas ordenadas
+    struct ListNode* lists[3];
+    
+    // Lista 1: [1, 4, 5]
+    lists[0] = createNode(1);
+    lists[0]->next = createNode(4);
+    lists[0]->next->next = createNode(5);
+
+    // Lista 2: [1, 3, 4]
+    lists[1] = createNode(1);
+    lists[1]->next = createNode(3);
+    lists[1]->next->next = createNode(4);
+
+    // Lista 3: [2, 6]
+    lists[2] = createNode(2);
+    lists[2]->next = createNode(6);
+
+    // Llamamos a la función para fusionar las listas
+    struct ListNode* mergedList = mergeKLists(lists, 3);
+    
+    // Imprimimos la lista fusionada
+    printList(mergedList);
+
+    return 0;
+}
